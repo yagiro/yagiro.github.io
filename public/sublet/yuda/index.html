@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <style>
+            .main-font {
+                font-family: Roboto, sans-serif !important;
+            }
+        </style>
+    </head>
+    <body class="main-font p-4 gap-6 flex flex-col justify-start items-center">
+        <div class="text-3xl">Sublet Yuda Yamit</div>
+        <div class="content flex flex-col items-stretch gap-3">
+            <pre class="out flex justify-start p-4 bg-orange-300 rounded border border-orange-400 text-orange-800 shadow-md"></pre>
+            <pre class="bills flex justify-start p-4 bg-sky-200 rounded border border-sky-400 text-sky-800 shadow-md"></pre>
+            <pre class="debug flex justify-start p-4 bg-gray-300 rounded border border-gray-400 text-gray-800 shadow-md"></pre>
+        </div>
+        <script>
+            const qs = document.querySelector.bind(document)
+            const el = {
+                out: qs('.out'),
+                bills: qs('.bills'),
+                debug: qs('.debug'),
+            }
+            
+            // config
+            const rent = 6500
+            const days = 8
+            const billsTwoMonths = {
+                arnona: 490,
+                electricity: 600,
+                water: 100,
+                housekeeping: 200,
+                internet: 280,
+            }
+
+            // utils
+
+            function calcDailyBills(billsTwoMonths) {
+                return Object.entries(billsTwoMonths)
+                    .map(([ billId, cost2Mon ]) => {
+                        const dailyBill = (cost2Mon * 6) / 365
+                        console.log(`daily bill (${ billId }) = ${ dailyBill }`)
+                        return ([ billId, dailyBill ])
+                    })
+                    .reduce(
+                        (dailyBillSum, [ _billId, currDailyBill ]) => dailyBillSum + currDailyBill,
+                        0
+                    )
+            }
+
+            function toPrice(num) {
+                return num.toFixed(2)
+            }
+
+
+            // derived
+
+            const dailyRent = (rent * 12) / 365
+            const dailyBills = calcDailyBills(billsTwoMonths)
+            const dailyTotal = dailyRent + dailyBills
+            const total = Math.round(dailyTotal * days)
+            
+            const monthlyBills = Math.round((dailyBills * 365) / 12)
+            
+            const out = {
+                rent,
+                monthlyBills,
+                days,
+                total,
+            }
+
+            const bills = {
+                billsTwoMonths,
+            }
+
+            const debug = {
+                monthTotal: rent + monthlyBills,
+                daily: {
+                    rent: toPrice(dailyRent),
+                    bills: toPrice(dailyBills),
+                    total: toPrice(dailyTotal),
+                },
+            }
+
+            el.out.innerHTML = JSON.stringify(out, null, 2)
+            el.debug.innerHTML = JSON.stringify(debug, null, 2)
+            el.bills.innerHTML = JSON.stringify(bills, null, 2)
+        </script>
+    </body>
+</html>
